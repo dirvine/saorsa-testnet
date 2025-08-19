@@ -1,0 +1,85 @@
+[package]
+name = "saorsa-testnet"
+version = "0.1.0"
+edition = "2021"
+authors = ["David Irvine <david.irvine@saorsalabs.com>"]
+description = "Comprehensive testing and monitoring tool for Saorsa P2P network"
+license = "AGPL-3.0-or-later"
+repository = "https://github.com/dirvine/saorsa-core"
+keywords = ["p2p", "testing", "monitoring", "nat-traversal", "network"]
+categories = ["network-programming", "command-line-utilities", "development-tools"]
+
+[[bin]]
+name = "saorsa-testnet"
+path = "src/main.rs"
+
+[dependencies]
+# Core dependencies
+saorsa-core = { path = "../saorsa-core", features = ["metrics"] }
+ant-quic = { version = "0.8.6", features = ["prometheus"] }
+anyhow = "1.0"
+tokio = { version = "1.38", features = ["full"] }
+async-trait = "0.1"
+
+# CLI and TUI
+clap = { version = "4.5", features = ["derive", "env", "color"] }
+ratatui = { version = "0.29", features = ["all-widgets"] }
+crossterm = "0.28"
+colored = "2.1"
+
+# Metrics and monitoring
+prometheus = "0.13"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+csv = "1.3"
+chrono = { version = "0.4", features = ["serde"] }
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json", "fmt"] }
+tracing-appender = "0.2"
+
+# Network and deployment
+reqwest = { version = "0.12", features = ["json", "stream"] }
+ssh2 = "0.9"
+octocrab = "0.41"  # GitHub API client
+
+# Data structures and utilities
+dashmap = "6.0"
+parking_lot = "0.12"
+bytes = "1.5"
+uuid = { version = "1.8", features = ["v4", "serde"] }
+rand = "0.8"
+
+# Missing dependencies for compilation
+hyper = { version = "0.14", features = ["full"] }
+futures = "0.3"
+shellexpand = "3.1"
+tempfile = "3.10"
+
+# Testing scenarios
+proptest = "1.4"
+criterion = { version = "0.5", features = ["html_reports"] }
+
+[dev-dependencies]
+tempfile = "3.10"
+mockito = "1.4"
+wiremock = "0.6"
+
+[features]
+default = ["tui", "deployment"]
+tui = []
+deployment = []
+benchmark = []
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true
+
+[profile.test]
+opt-level = 2
+
+[profile.bench]
+inherits = "release"
