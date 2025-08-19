@@ -5,7 +5,7 @@ edition = "2021"
 authors = ["David Irvine <david.irvine@saorsalabs.com>"]
 description = "Comprehensive testing and monitoring tool for Saorsa P2P network"
 license = "AGPL-3.0-or-later"
-repository = "https://github.com/dirvine/saorsa-core"
+repository = "https://github.com/dirvine/saorsa-testnet"
 keywords = ["p2p", "testing", "monitoring", "nat-traversal", "network"]
 categories = ["network-programming", "command-line-utilities", "development-tools"]
 
@@ -15,7 +15,7 @@ path = "src/main.rs"
 
 [dependencies]
 # Core dependencies
-saorsa-core = { path = "../saorsa-core", features = ["metrics"] }
+saorsa-core = { version = "0.3.7", features = ["metrics"] }
 ant-quic = { version = "0.8.6", features = ["prometheus"] }
 anyhow = "1.0"
 tokio = { version = "1.38", features = ["full"] }
