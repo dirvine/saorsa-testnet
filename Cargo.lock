@@ -4377,6 +4377,8 @@ dependencies = [
 [[package]]
 name = "saorsa-core"
 version = "0.3.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5c20b6669e0457071dedf63abfecd86469f186f3699acf8e2c803b648d4137d3"
 dependencies = [
  "aes-gcm",
  "ant-quic",
