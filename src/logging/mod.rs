@@ -106,6 +106,7 @@ pub mod aggregation {
     }
     
     /// Log aggregator for collecting logs from multiple sources
+    #[allow(dead_code)]
     pub struct LogAggregator {
         sources: Vec<LogSource>,
         output_dir: PathBuf,
@@ -113,6 +114,7 @@ pub mod aggregation {
     
     impl LogAggregator {
         /// Create new aggregator
+        #[allow(dead_code)]
         pub fn new(output_dir: PathBuf) -> Self {
             Self {
                 sources: Vec::new(),
@@ -121,11 +123,13 @@ pub mod aggregation {
         }
         
         /// Add a log source
+        #[allow(dead_code)]
         pub fn add_source(&mut self, source: LogSource) {
             self.sources.push(source);
         }
         
         /// Aggregate logs from all sources
+        #[allow(dead_code)]
         pub async fn aggregate(&self) -> Result<Vec<LogEntry>> {
             let mut all_entries = Vec::new();
             
@@ -141,6 +145,7 @@ pub mod aggregation {
         }
         
         /// Collect logs from a specific source
+        #[allow(dead_code)]
         async fn collect_from_source(&self, source: &LogSource) -> Result<Vec<LogEntry>> {
             match source {
                 LogSource::LocalFile(path) => self.read_local_file(path),
@@ -154,6 +159,7 @@ pub mod aggregation {
         }
         
         /// Read logs from local file
+        #[allow(dead_code)]
         fn read_local_file(&self, path: &PathBuf) -> Result<Vec<LogEntry>> {
             let file = File::open(path)?;
             let reader = BufReader::new(file);
@@ -170,11 +176,12 @@ pub mod aggregation {
         }
         
         /// Read logs from remote node via SSH
+        #[allow(dead_code)]
         async fn read_remote_file(
             &self,
             host: &str,
             path: &str,
-            ssh_key: &PathBuf,
+            ssh_key: &Path,
         ) -> Result<Vec<LogEntry>> {
             use std::process::Command;
             
@@ -183,7 +190,7 @@ pub mod aggregation {
             let temp_path = temp_file.path();
             
             let output = Command::new("scp")
-                .args(&[
+                .args([
                     "-i", &ssh_key.to_string_lossy(),
                     "-o", "StrictHostKeyChecking=no",
                     &format!("{}:{}", host, path),
@@ -200,6 +207,7 @@ pub mod aggregation {
         }
         
         /// Collect metrics from HTTP endpoint
+        #[allow(dead_code)]
         async fn collect_metrics(&self, url: &str) -> Result<Vec<LogEntry>> {
             let client = reqwest::Client::new();
             let response = client.get(url).send().await?;
@@ -212,6 +220,7 @@ pub mod aggregation {
         }
         
         /// Parse Prometheus metrics into log entries
+        #[allow(dead_code)]
         fn parse_prometheus_metrics(&self, text: &str) -> Result<Vec<LogEntry>> {
             let mut entries = Vec::new();
             let timestamp = Utc::now();
@@ -266,6 +275,7 @@ pub mod aggregation {
         }
         
         /// Export aggregated logs
+        #[allow(dead_code)]
         pub async fn export(&self, entries: &[LogEntry], format: ExportFormat) -> Result<()> {
             let filename = match format {
                 ExportFormat::Json => "aggregated.json",
@@ -298,6 +308,7 @@ pub mod aggregation {
         }
         
         /// Export to CSV format
+        #[allow(dead_code)]
         fn export_csv(&self, entries: &[LogEntry], path: &PathBuf) -> Result<()> {
             use std::io::Write;
             
@@ -325,6 +336,7 @@ pub mod aggregation {
     
     /// Log source types
     #[derive(Debug, Clone)]
+    #[allow(dead_code)]
     pub enum LogSource {
         LocalFile(PathBuf),
         RemoteNode {
@@ -337,6 +349,7 @@ pub mod aggregation {
     
     /// Export formats
     #[derive(Debug, Clone)]
+    #[allow(dead_code)]
     pub enum ExportFormat {
         Json,
         Csv,
@@ -346,10 +359,10 @@ pub mod aggregation {
 
 /// Performance logging utilities
 pub mod performance {
-    use super::*;
     use std::time::{Duration, Instant};
     
     /// Performance timer for measuring operation duration
+    #[allow(dead_code)]
     pub struct PerfTimer {
         start: Instant,
         operation: String,
@@ -357,6 +370,7 @@ pub mod performance {
     
     impl PerfTimer {
         /// Start timing an operation
+        #[allow(dead_code)]
         pub fn start(operation: impl Into<String>) -> Self {
             Self {
                 start: Instant::now(),
@@ -365,6 +379,7 @@ pub mod performance {
         }
         
         /// Complete timing and log result
+        #[allow(dead_code)]
         pub fn complete(self) -> Duration {
             let duration = self.start.elapsed();
             
@@ -380,6 +395,7 @@ pub mod performance {
     }
     
     /// Log structured metrics
+    #[allow(dead_code)]
     pub fn log_metric(name: &str, value: f64, unit: &str, labels: Option<&[(&str, &str)]>) {
         let mut fields = vec![
             ("metric_name", name),
@@ -399,6 +415,7 @@ pub mod performance {
     }
     
     /// Log NAT traversal metrics
+    #[allow(dead_code)]
     pub fn log_nat_traversal(
         nat_type: &str,
         success: bool,
@@ -428,6 +445,7 @@ pub mod performance {
     }
     
     /// Log adaptive network metrics
+    #[allow(dead_code)]
     pub fn log_adaptive_metrics(
         thompson_success_rate: f64,
         mab_reward: f64,

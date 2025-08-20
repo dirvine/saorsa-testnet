@@ -9,6 +9,7 @@ use std::time::Duration;
 use tracing::{info, warn};
 
 /// DigitalOcean deployer
+#[allow(dead_code)]
 pub struct DigitalOceanDeployer {
     api_token: String,
     ssh_key_path: PathBuf,
@@ -68,7 +69,7 @@ impl DigitalOceanDeployer {
     async fn validate_region(&self, region: &str) -> Result<()> {
         // This would use the DigitalOcean API to validate
         // For now, just check against known regions
-        let valid_regions = vec![
+        let valid_regions = [
             "nyc1", "nyc3", "sfo3", "ams3", "sgp1", "lon1", "fra1",
             "tor1", "blr1", "syd1"
         ];
@@ -107,7 +108,7 @@ impl DigitalOceanDeployer {
         
         // Build release binary
         let output = std::process::Command::new("cargo")
-            .args(&["build", "--release", "--bin", "saorsa-testnet"])
+            .args(["build", "--release", "--bin", "saorsa-testnet"])
             .output()
             .context("Failed to build binary")?;
         
@@ -148,7 +149,7 @@ impl DigitalOceanDeployer {
         for i in 0..count {
             let name = format!("saorsa-testnet-{}-{}", region, i);
             
-            let request = CreateDropletRequest {
+            let _request = CreateDropletRequest {
                 name: name.clone(),
                 region: region.to_string(),
                 size: "s-2vcpu-4gb".to_string(),
@@ -265,6 +266,7 @@ echo "NODE_ID=testnet-{region}-{index}" >> /etc/environment
 }
 
 /// Cluster monitor for remote monitoring
+#[allow(dead_code)]
 pub struct ClusterMonitor {
     cluster_name: String,
     ssh_key_path: PathBuf,
@@ -374,6 +376,7 @@ struct CreateDropletRequest {
 }
 
 #[derive(Debug)]
+#[allow(dead_code)]
 struct Droplet {
     id: u64,
     name: String,

@@ -216,6 +216,7 @@ pub async fn collect_stats(detailed: bool) -> Result<NetworkStats> {
 }
 
 /// Export metrics to file
+#[allow(dead_code)]
 pub fn export_metrics(stats: &NetworkStats, path: &std::path::Path) -> Result<()> {
     use std::fs::File;
     

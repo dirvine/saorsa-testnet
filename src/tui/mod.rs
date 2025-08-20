@@ -91,9 +91,7 @@ impl Dashboard {
                             selected_tab = (selected_tab + 1) % 4;
                         }
                         KeyCode::Left => {
-                            if selected_tab > 0 {
-                                selected_tab -= 1;
-                            }
+                            selected_tab = selected_tab.saturating_sub(1);
                         }
                         KeyCode::Right => {
                             if selected_tab < 3 {
@@ -130,6 +128,7 @@ impl Dashboard {
     }
     
     /// Draw the UI
+    #[allow(dead_code)]
     fn draw(&mut self, f: &mut Frame) {
         let size = f.area();
         
@@ -164,6 +163,7 @@ impl Dashboard {
     }
     
     /// Draw header
+    #[allow(dead_code)]
     fn draw_header(&self, f: &mut Frame, area: Rect) {
         let header = Paragraph::new(vec![
             Line::from(vec![
@@ -179,6 +179,7 @@ impl Dashboard {
     }
     
     /// Draw tabs
+    #[allow(dead_code)]
     fn draw_tabs(&self, f: &mut Frame, area: Rect) {
         let titles = vec!["Overview", "NAT Traversal", "Adaptive Network", "Performance"];
         let tabs = Tabs::new(titles)
@@ -191,6 +192,7 @@ impl Dashboard {
     }
     
     /// Draw overview tab
+    #[allow(dead_code)]
     fn draw_overview(&self, f: &mut Frame, area: Rect) {
         let chunks = Layout::default()
             .direction(Direction::Horizontal)
@@ -217,6 +219,7 @@ impl Dashboard {
     }
     
     /// Draw node info
+    #[allow(dead_code)]
     fn draw_node_info(&self, f: &mut Frame, area: Rect) {
         let info = vec![
             Line::from(vec![
@@ -244,6 +247,7 @@ impl Dashboard {
     }
     
     /// Draw network stats
+    #[allow(dead_code)]
     fn draw_network_stats(&self, f: &mut Frame, area: Rect) {
         let stats = vec![
             Line::from(vec![
@@ -271,6 +275,7 @@ impl Dashboard {
     }
     
     /// Draw connections graph
+    #[allow(dead_code)]
     fn draw_connections_graph(&self, f: &mut Frame, area: Rect) {
         let sparkline = Sparkline::default()
             .block(Block::default().title("Connections History").borders(Borders::ALL))
@@ -281,6 +286,7 @@ impl Dashboard {
     }
     
     /// Draw bandwidth graph
+    #[allow(dead_code)]
     fn draw_bandwidth_graph(&self, f: &mut Frame, area: Rect) {
         let sparkline = Sparkline::default()
             .block(Block::default().title("Bandwidth (KB/s)").borders(Borders::ALL))
@@ -291,6 +297,7 @@ impl Dashboard {
     }
     
     /// Draw NAT metrics tab
+    #[allow(dead_code)]
     fn draw_nat_metrics(&self, f: &mut Frame, area: Rect) {
         let chunks = Layout::default()
             .direction(Direction::Vertical)
@@ -324,6 +331,7 @@ impl Dashboard {
     }
     
     /// Draw adaptive metrics tab
+    #[allow(dead_code)]
     fn draw_adaptive_metrics(&self, f: &mut Frame, area: Rect) {
         let chunks = Layout::default()
             .direction(Direction::Horizontal)
@@ -382,6 +390,7 @@ impl Dashboard {
     }
     
     /// Draw performance tab
+    #[allow(dead_code)]
     fn draw_performance(&self, f: &mut Frame, area: Rect) {
         let chunks = Layout::default()
             .direction(Direction::Vertical)
@@ -424,6 +433,7 @@ impl Dashboard {
     }
     
     /// Draw footer
+    #[allow(dead_code)]
     fn draw_footer(&self, f: &mut Frame, area: Rect) {
         let footer = Paragraph::new(vec![
             Line::from(vec![
@@ -442,6 +452,7 @@ impl Dashboard {
     }
     
     /// Update metrics
+    #[allow(dead_code)]
     async fn update_metrics(&mut self) {
         // Update history buffers (shift left and add new value)
         self.latency_history.rotate_left(1);
@@ -499,9 +510,9 @@ impl Dashboard {
     
     /// Static update metrics
     async fn update_metrics_static(
-        latency_history: &mut Vec<u64>,
-        bandwidth_history: &mut Vec<u64>,
-        connections_history: &mut Vec<u64>,
+        latency_history: &mut [u64],
+        bandwidth_history: &mut [u64],
+        connections_history: &mut [u64],
         last_update: &mut Instant,
     ) {
         // Update history buffers (shift left and add new value)

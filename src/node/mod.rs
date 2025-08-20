@@ -8,12 +8,13 @@ pub mod worker;
 pub use bootstrap::BootstrapNode;
 pub use worker::WorkerNode;
 
-use anyhow::Result;
+
 use std::sync::Arc;
 use tokio::sync::RwLock;
 
 /// Common node functionality
 #[derive(Debug)]
+#[allow(dead_code)]
 pub struct NodeState {
     pub node_id: String,
     pub uptime: std::time::Duration,

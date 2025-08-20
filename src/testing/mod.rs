@@ -111,7 +111,7 @@ impl TestScenario {
         
         let mut handles = vec![];
         
-        for i in 0..count {
+        for _i in 0..count {
             let handle = tokio::spawn(async move {
                 // Simulate connection attempt
                 tokio::time::sleep(Duration::from_millis(rand::random::<u64>() % 1000)).await;
@@ -218,7 +218,7 @@ impl TestScenario {
     
     /// Test specific load level
     async fn test_load_level(&self, messages_per_sec: usize) -> Result<(f64, f64, f64)> {
-        let duration = Duration::from_secs(10);
+        let _duration = Duration::from_secs(10);
         let total_messages = messages_per_sec * 10;
         
         let mut latencies = Vec::new();
@@ -244,7 +244,7 @@ impl TestScenario {
         let success_rate = successes as f64 / total_messages as f64;
         let avg_latency = latencies.iter().sum::<f64>() / latencies.len() as f64;
         
-        latencies.sort_by(|a, b| a.partial_cmp(b).unwrap());
+        latencies.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
         let p99_index = (latencies.len() as f64 * 0.99) as usize;
         let p99_latency = latencies[p99_index.min(latencies.len() - 1)];
         
@@ -419,7 +419,7 @@ impl TestResults {
 // Test result structures
 
 #[derive(Debug, serde::Serialize)]
-struct NatTestResult {
+pub struct NatTestResult {
     attempts: usize,
     successes: usize,
     average_punch_time_ms: f64,
@@ -437,7 +437,7 @@ impl NatTestResult {
 }
 
 #[derive(Debug, serde::Serialize)]
-struct ChurnEvent {
+pub struct ChurnEvent {
     timestamp: Duration,
     nodes_joined: usize,
     nodes_left: usize,
@@ -445,7 +445,7 @@ struct ChurnEvent {
 }
 
 #[derive(Debug, serde::Serialize)]
-struct StressTestResult {
+pub struct StressTestResult {
     load_level: usize,
     success_rate: f64,
     average_latency_ms: f64,
@@ -453,7 +453,7 @@ struct StressTestResult {
 }
 
 #[derive(Debug, serde::Serialize)]
-struct GeographicTestResult {
+pub struct GeographicTestResult {
     locations: Vec<String>,
     intra_region_latency_ms: f64,
     inter_region_latency_ms: f64,

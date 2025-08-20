@@ -42,9 +42,9 @@ pub struct WorkerNode {
     metrics_registry: Option<Registry>,
     
     /// Metrics
-    connections_total: Option<IntCounterVec>,
-    active_connections: Option<IntGaugeVec>,
-    messages_total: Option<IntCounterVec>,
+    _connections_total: Option<IntCounterVec>,
+    _active_connections: Option<IntGaugeVec>,
+    _messages_total: Option<IntCounterVec>,
     latency_histogram: Option<HistogramVec>,
     crypto_operations: Option<CounterVec>,
     nat_traversal_attempts: Option<IntCounterVec>,
@@ -72,8 +72,10 @@ impl WorkerNode {
             .context("Failed to generate node identity")?;
         
         // Create network config
-        let mut config = NetworkConfig::default();
-        config.bootstrap_nodes = vec![bootstrap.to_string()];
+        let config = NetworkConfig {
+            bootstrap_nodes: vec![bootstrap.to_string()],
+            ..Default::default()
+        };
         
         // Create coordinator
         let coordinator = Arc::new(
@@ -139,8 +141,10 @@ impl WorkerNode {
             (None, None, None, None, None, None, None, None, None)
         };
         
-        let mut state = NodeState::default();
-        state.node_id = node_id.clone();
+        let state = NodeState {
+            node_id: node_id.clone(),
+            ..Default::default()
+        };
         
         Ok(Self {
             coordinator,
@@ -151,9 +155,9 @@ impl WorkerNode {
             metrics_port,
             chat_enabled: chat,
             metrics_registry: registry,
-            connections_total,
-            active_connections,
-            messages_total,
+            _connections_total: connections_total,
+            _active_connections: active_connections,
+            _messages_total: messages_total,
             latency_histogram,
             crypto_operations,
             nat_traversal_attempts,
@@ -251,7 +255,7 @@ impl WorkerNode {
         let hash = self.coordinator.store(test_data.as_bytes().to_vec()).await?;
         
         // Update metrics
-        if let Some(counter) = &self.messages_total {
+        if let Some(counter) = &self._messages_total {
             counter.with_label_values(&["sent", "store"]).inc();
         }
         
@@ -266,7 +270,7 @@ impl WorkerNode {
         let latency = start.elapsed();
         
         // Update metrics
-        if let Some(counter) = &self.messages_total {
+        if let Some(counter) = &self._messages_total {
             counter.with_label_values(&["received", "retrieve"]).inc();
         }
         if let Some(histogram) = &self.latency_histogram {
@@ -284,7 +288,7 @@ impl WorkerNode {
         self.coordinator.publish("test_topic", message.as_bytes().to_vec()).await?;
         
         // Update metrics
-        if let Some(counter) = &self.messages_total {
+        if let Some(counter) = &self._messages_total {
             counter.with_label_values(&["sent", "gossip"]).inc();
         }
         
@@ -301,7 +305,7 @@ impl WorkerNode {
     
     /// Send random data to other nodes
     async fn send_random_data(&self) -> Result<()> {
-        let data_types = vec!["telemetry", "heartbeat", "discovery", "routing_update", "challenge"];
+        let data_types = ["telemetry", "heartbeat", "discovery", "routing_update", "challenge"];
         let data_type = data_types[rand::random::<usize>() % data_types.len()];
         
         // Generate random data of varying sizes
@@ -315,7 +319,7 @@ impl WorkerNode {
         };
         
         let random_data: Vec<u8> = (0..size).map(|_| rand::random::<u8>()).collect();
-        let peer_types = vec!["bootstrap", "worker", "relay"];
+        let peer_types = ["bootstrap", "worker", "relay"];
         let peer_type = peer_types[rand::random::<usize>() % peer_types.len()];
         
         info!("Sending {} bytes of {} data to {} peer", size, data_type, peer_type);
@@ -342,7 +346,7 @@ impl WorkerNode {
         
         // Simulate NAT traversal attempt
         if rand::random::<f64>() < 0.3 { // 30% chance of NAT traversal
-            let nat_types = vec!["full_cone", "restricted", "port_restricted", "symmetric"];
+            let nat_types = ["full_cone", "restricted", "port_restricted", "symmetric"];
             let nat_type = nat_types[rand::random::<usize>() % nat_types.len()];
             let success = rand::random::<f64>() > 0.2; // 80% success rate
             
@@ -354,7 +358,7 @@ impl WorkerNode {
         // Simulate cryptographic operations
         if let Some(crypto_counter) = &self.crypto_operations {
             // Random crypto operations
-            let operations = vec![
+            let operations = [
                 ("ChaCha20Poly1305", "encrypt"),
                 ("ML-KEM-768", "decapsulate"),
                 ("X25519", "derive"),
@@ -385,7 +389,7 @@ impl WorkerNode {
             
             let keys: Vec<_> = shared_data.keys().collect();
             let random_key = keys[rand::random::<usize>() % keys.len()];
-            shared_data.get(random_key).unwrap().clone()
+            *shared_data.get(random_key).ok_or_else(|| anyhow::anyhow!("Key not found in shared data"))?
         };
         
         info!("Reading shared data from DHT: {:?}", hash_to_read);
@@ -403,7 +407,7 @@ impl WorkerNode {
                         .observe(latency.as_secs_f64());
                 }
                 
-                if let Some(counter) = &self.messages_total {
+                if let Some(counter) = &self._messages_total {
                     counter.with_label_values(&["received", "cross_node"]).inc();
                 }
                 
@@ -468,10 +472,7 @@ impl WorkerNode {
                             let mut buffer = Vec::new();
                             if let Err(e) = encoder.encode(&metric_families, &mut buffer) {
                                 error!("Failed to encode metrics: {}", e);
-                                return Ok::<_, hyper::Error>(hyper::Response::builder()
-                                    .status(500)
-                                    .body(hyper::Body::from("Internal Server Error"))
-                                    .unwrap());
+                                return Ok::<_, hyper::Error>(hyper::Response::new(hyper::Body::from("Internal Server Error")));
                             }
                             
                             Ok::<_, hyper::Error>(hyper::Response::new(hyper::Body::from(buffer)))
@@ -492,6 +493,7 @@ impl WorkerNode {
     }
     
     /// Get current state for monitoring
+    #[allow(dead_code)]
     pub fn get_state(&self) -> SharedNodeState {
         self.state.clone()
     }

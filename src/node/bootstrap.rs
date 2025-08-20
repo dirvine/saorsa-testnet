@@ -38,8 +38,8 @@ pub struct BootstrapNode {
     
     /// Metrics
     connections_total: Option<IntCounterVec>,
-    active_connections: Option<IntGaugeVec>,
-    messages_total: Option<IntCounterVec>,
+    _active_connections: Option<IntGaugeVec>,
+    _messages_total: Option<IntCounterVec>,
 }
 
 impl BootstrapNode {
@@ -104,8 +104,8 @@ impl BootstrapNode {
             pqc_enabled: pqc,
             metrics_registry: registry,
             connections_total,
-            active_connections,
-            messages_total,
+            _active_connections: active_connections,
+            _messages_total: messages_total,
         })
     }
     
@@ -185,10 +185,7 @@ impl BootstrapNode {
                             let mut buffer = Vec::new();
                             if let Err(e) = encoder.encode(&metric_families, &mut buffer) {
                                 error!("Failed to encode metrics: {}", e);
-                                return Ok::<_, hyper::Error>(hyper::Response::builder()
-                                    .status(500)
-                                    .body(hyper::Body::from("Internal Server Error"))
-                                    .unwrap());
+                                return Ok::<_, hyper::Error>(hyper::Response::new(hyper::Body::from("Internal Server Error")));
                             }
                             
                             Ok::<_, hyper::Error>(hyper::Response::new(hyper::Body::from(buffer)))
